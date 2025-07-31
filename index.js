@@ -17,12 +17,15 @@ let state = {
 
 // Получение элементов с пагинацией и поиском
 app.get("/api/items", (req, res) => {
-  const { search, offset = 0, limit = 20 } = req.query;
+  const { min = -Infinity, max = Infinity, offset = 0, limit = 20 } = req.query;
   let items = state.sortedItems;
 
   // Фильтрация по поисковому запросу (если есть)
-  if (search) {
-    items = items.filter((item) => item.value > search);
+  if (min > -Infinity) {
+    items = items.filter((item) => item.value >= min);
+  }
+  if (max < Infinity) {
+    items = items.filter((item) => item.value <= max);
   }
 
   // Пагинация
@@ -40,9 +43,20 @@ app.get("/api/items", (req, res) => {
 
 // Получение текущего состояния
 app.get("/api/state", (req, res) => {
+  const { min = -Infinity, max = Infinity, offset = 0, limit = 20 } = req.query;
+  let items = state.sortedItems;
+  
+    // Фильтрация по поисковому запросу (если есть)
+    if (min > -Infinity) {
+        items = items.filter((item) => item.value >= min);
+      }
+      if (max < Infinity) {
+        items = items.filter((item) => item.value <= max);
+      }
+
   res.json({
     selectedItems: state.selectedItems,
-    sortedItems: state.sortedItems.slice(0, 20), // Возвращаем первые 20 элементов
+    sortedItems: items.slice(offset, offset + limit), // Возвращаем первые 20 элементов
   });
 });
 
