@@ -13,19 +13,17 @@ let state = {
     value: i + 1, // Значение элемента
     order: i + 1, // Порядковый номер
   })),
+  search: ''
 };
 
 // Получение элементов с пагинацией и поиском
 app.get("/api/items", (req, res) => {
-  const { min = -Infinity, max = Infinity, offset = 0, limit = 20 } = req.query;
+  const {search, offset = 0, limit = 20 } = req.query;
   let items = state.sortedItems;
-
+  state.search = search;
   // Фильтрация по поисковому запросу (если есть)
-  if (min > -Infinity) {
-    items = items.filter((item) => item.value >= min);
-  }
-  if (max < Infinity) {
-    items = items.filter((item) => item.value <= max);
+  if (search) {
+    items = items.filter((item) => item.value.toString().includes(search));
   }
 
   // Пагинация
@@ -43,18 +41,15 @@ app.get("/api/items", (req, res) => {
 
 // Получение текущего состояния
 app.get("/api/state", (req, res) => {
-  const { min = -Infinity, max = Infinity, offset = 0, limit = 20 } = req.query;
+  const { search = state.search, offset = 0, limit = 20 } = req.query;
   let items = state.sortedItems;
-  
     // Фильтрация по поисковому запросу (если есть)
-    if (min > -Infinity) {
-        items = items.filter((item) => item.value >= min);
-      }
-      if (max < Infinity) {
-        items = items.filter((item) => item.value <= max);
+    if (search) {
+        items = items.filter((item) => item.value.toString().includes(search));
       }
 
   res.json({
+    search: state.search ?? '',
     selectedItems: state.selectedItems,
     sortedItems: items.slice(offset, offset + limit), // Возвращаем первые 20 элементов
   });
@@ -88,8 +83,8 @@ app.post("/api/state", (req, res) => {
 });
 
 // Запуск сервера
-// app.listen(5000, () => {
-//   console.log("Сервер запущен на http://localhost:5000");
-// });
+app.listen(5000, () => {
+  console.log("Сервер запущен на http://localhost:5000");
+});
 
 module.exports = app;
