@@ -83,8 +83,8 @@ app.post("/api/state", (req, res) => {
 });
 
 // Запуск сервера
-app.listen(5000, () => {
-  console.log("Сервер запущен на http://localhost:5000");
-});
+// app.listen(5000, () => {
+//   console.log("Сервер запущен на http://localhost:5000");
+// });
 
 module.exports = app;
